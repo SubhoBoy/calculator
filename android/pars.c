@@ -2,11 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include <math.h> // Used only for NAN or basic operators if not in func.c
 
 #define MAX 256
 
-// --- External Functions from func.c ---
 extern double m_abs(double x);
 extern double m_sqrt(double n);
 extern double m_sin(double x);
@@ -172,7 +170,7 @@ double eval_rpn(char rpn[MAX][10], int n, double var_val) {
 
 // --- Main Interface for Python ---
 // If step <= 0 or start==end, we evaluate once. Otherwise we generate a CSV list.
-void compute_expression(const char* input, double start, double end, double step, char* output) {
+void compute(const char* input, double start, double end, double step, char* output) {
     char rpn[MAX][10];
     int n = 0;
     

@@ -73,6 +73,7 @@ class CalcLayout(BoxLayout):
                             break
                         data_fragments.append(chunk)
                     except socket.timeout:
+                        # TODO This isn't working, app itself hangs
                         break # Stop if server hangs, though server should close conn
                 
                 full_response = b''.join(data_fragments).decode('utf-8')

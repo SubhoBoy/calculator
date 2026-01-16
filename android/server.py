@@ -2,21 +2,42 @@ import socket
 import ctypes
 import os
 
-so_file = os.path.abspath("libcalc.so") # abs path cuz otherwise termx blerghs
+# Load library
+# Ensure func.c and pars2.c are compiled into libcalc.so:
+# gcc -shared -o libcalc.so -fPIC func.c pars2.c
+so_file = os.path.abspath("libcalc.so") 
 lib = ctypes.CDLL(so_file)
 
 # Define C function signature
 # void compute_expression(const char* input, double start, double end, double step, char* output)
-lib.compute_expression.argtypes = [ctypes.c_char_p, ctypes.c_double, ctypes.c_double, ctypes.c_double, ctypes.c_char_p]
+lib.compute_expression.argtypes = [
+    ctypes.c_char_p, 
+    ctypes.c_double, 
+    ctypes.c_double, 
+    ctypes.c_double, 
+    ctypes.c_char_p
+]
 lib.compute_expression.restype = None
 
 def process_request(expression):
+    expression = expression.strip()
+    
+    # Simple heuristic: if 'x' or 't' is present, it's a plot request.
+    # Otherwise, it's a simple calculation.
+    is_plot = 'x' in expression or 't' in expression
+    
     # Prepare buffers
     input_str = expression.encode('utf-8')
-    output_buffer = ctypes.create_string_buffer(1024)
+    # Increased buffer size for plotting data
+    output_buffer = ctypes.create_string_buffer(65536) 
     
-    # Call C Logic (Example params: t=0 to 10, step=0.1)
-    lib.compute_expression(input_str, 0.0, 10.0, 0.1, output_buffer)
+    if is_plot:
+        # Plot mode: 0 to 10 with step 0.5
+        # (Users can change this logic to accept params from client if needed)
+        lib.compute_expression(input_str, 0.0, 10.0, 0.5, output_buffer)
+    else:
+        # Scalar mode: Range doesn't matter, step=0 triggers single eval
+        lib.compute_expression(input_str, 0.0, 0.0, 0.0, output_buffer)
     
     return output_buffer.value
 
@@ -31,18 +52,27 @@ def start():
         s.listen()
         
         while True:
-            conn, addr = s.accept()
-            with conn:
-                data = conn.recv(1024)
-                if not data:
-                    break
-                expr = data.decode('utf-8')
-                print(f"[Received] {expr}")
-                
-                # Process with C
-                response = process_request(expr)
-                
-                conn.sendall(response)
+            try:
+                conn, addr = s.accept()
+                with conn:
+                    #print(f"[Connected] {addr}")
+                    data = conn.recv(1024)
+                    if not data:
+                        break
+                    expr = data.decode('utf-8')
+                    print(f"[Received] {expr}")
+                    
+                    try:
+                        response = process_request(expr)
+                    except Exception as e:
+                        response = f"Error: {e}".encode('utf-8')
+                    
+                    conn.sendall(response)
+            except KeyboardInterrupt:
+                print("\nStopping server...")
+                break
+            except Exception as e:
+                print(f"Server Error: {e}")
 
 if __name__ == "__main__":
     start()

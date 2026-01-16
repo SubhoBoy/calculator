@@ -5,6 +5,8 @@
 #define H  0.01
 #define ORD 2
 
+#define DEBUG 0
+
 typedef void (*sys_f)(double t, double *y, double *dy, void *ctx);
 
 double m_abs(double x) { return x < 0 ? -x : x; }
@@ -90,6 +92,7 @@ double m_fact(double n) {
     return (n <= 1) ? 1 : n * m_fact(n - 1);
 }
 
+#ifdef DEBUG
 int main(int argc, char *argv[]) {
     int sel = atoi(argv[1]);
     double v = atof(argv[2]);
@@ -114,3 +117,4 @@ int main(int argc, char *argv[]) {
     printf("%lf\n", out);
     return 0;
 }
+#endif

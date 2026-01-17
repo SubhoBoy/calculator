@@ -30,7 +30,7 @@ def process(expression):
 #        lib.compute(input_str, 0.0, 10.0, 0.5, output_buffer)
 #    else:
 #        # Scalar mode: Range doesn't matter, step=0 triggers single eval
-    lib.compute(input_str, 0.0, 0.0, 0.0, output_buffer)
+    lib.compute(input_str, 0.0, 0.0, 0.0, out_buf)
     
     return out_buf.value
 

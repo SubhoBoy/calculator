@@ -14,15 +14,10 @@ extern double m_ln(double x);
 extern double m_pow(double x, double w);
 extern double m_fact(double n);
 
-// --- Safety Utils ---
 void error(const char *msg) {
-    // In a server context, we usually don't want to exit(1), 
-    // but for this structure we will print and return 0/NaN logic later if possible.
-    // For now, keeping original behavior but identifying it.
     fprintf(stderr, "Error: %s\n", msg);
 }
 
-// --- Stack Implementations ---
 typedef struct { char data[MAX][32]; int top; } S_Str;
 typedef struct { double data[MAX]; int top; } S_Dbl;
 
@@ -51,7 +46,6 @@ double pop_d(S_Dbl *s) {
     return s->data[s->top--];
 }
 
-// --- Safe Shunting Yard ---
 int prec(char *op) {
     if (!strcmp(op, "!")) return 5; // Factorial
     if (!strcmp(op, "^")) return 4;
@@ -70,8 +64,6 @@ int is_op(char *t) {
            !strcmp(t,"/") || !strcmp(t,"^") || !strcmp(t,"!");
 }
 
-// Helper: Add spaces around operators to make strtok work 
-// e.g., "sin(x)+2" -> "sin ( x ) + 2 "
 void tokenize_buffer(const char *input, char *output) {
     int j = 0;
     for (int i = 0; input[i] != '\0' && j < MAX*10; i++) {
@@ -128,7 +120,6 @@ void shunt(char *input_expr, char output[MAX][10], int *out_len) {
     }
 }
 
-// --- RPN Evaluator ---
 double eval_rpn(char rpn[MAX][10], int n, double var_val) {
     S_Dbl vals = { .top = -1 };
 
@@ -140,12 +131,11 @@ double eval_rpn(char rpn[MAX][10], int n, double var_val) {
         } else if (!strcmp(t, "x") || !strcmp(t, "t")) {
             push_d(&vals, var_val);
         } else if (is_op(t)) {
-            // Unary operators (like factorial if implemented strictly as op)
             if (!strcmp(t, "!")) {
                 double a = pop_d(&vals);
                 push_d(&vals, m_fact(a));
             } 
-            // Binary operators
+
             else {
                 double b = pop_d(&vals);
                 double a = pop_d(&vals);
@@ -160,7 +150,7 @@ double eval_rpn(char rpn[MAX][10], int n, double var_val) {
             if (!strcmp(t, "sin")) push_d(&vals, m_sin(a));
             else if (!strcmp(t, "cos")) push_d(&vals, m_cos(a));
             else if (!strcmp(t, "tan")) push_d(&vals, m_tan(a));
-            else if (!strcmp(t, "ln")) push_d(&vals, m_ln(a));
+            lse if (!strcmp(t, "ln")) push_d(&vals, m_ln(a));
             else if (!strcmp(t, "sqrt")) push_d(&vals, m_sqrt(a));
             else if (!strcmp(t, "fact")) push_d(&vals, m_fact(a));
         }
@@ -168,7 +158,6 @@ double eval_rpn(char rpn[MAX][10], int n, double var_val) {
     return pop_d(&vals);
 }
 
-// --- Main Interface for Python ---
 // If step <= 0 or start==end, we evaluate once. Otherwise we generate a CSV list.
 void compute(const char* input, double start, double end, double step, char* output) {
     char rpn[MAX][10];
@@ -179,17 +168,15 @@ void compute(const char* input, double start, double end, double step, char* out
     
     output[0] = '\0'; // Initialize buffer
     
-    // 2. Evaluate
     // Mode A: Single scalar (Calculator)
     if (step <= 0 || (m_abs(end - start) < 1e-9)) {
-        double res = eval_rpn(rpn, n, start); // Use start as the variable value if needed
+        double res = eval_rpn(rpn, n, start);
         sprintf(output, "%.6f", res);
     } 
     // Mode B: Function Mapping (Plotter)
     else {
         char line[64];
         double t = start;
-        // Limit iterations to prevent buffer overflow (assuming 64k buffer)
         int safety = 0; 
         while (t <= end + 1e-9 && safety++ < 2000) {
             double res = eval_rpn(rpn, n, t);

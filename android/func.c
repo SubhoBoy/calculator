@@ -76,7 +76,7 @@ double m_cos(double x) { return m_sin(PI/2 - x); }
 double m_tan(double x) { return m_sin(x) / m_cos(x); }
 
 double m_ln(double x) {
-    //if (x <= 0) return ;
+    if (x <= 0) return -1.0/0.0;
     double y[1] = {0};
     solve(1, x, y, 1, d_ln, NULL);
     return y[0];

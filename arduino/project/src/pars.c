@@ -39,11 +39,20 @@ char* peek_s(S_Str *s) {
 void push_d(S_Dbl *s, double v) {
     if (s->top >= MAX - 1) { error("Value Stack Overflow"); return; }
     s->data[++s->top] = v;
+    // DEBUG PRINT
+    // char debug_buf[16];
+    // sprintf(debug_buf, "P:%.2f", v);
+    // lcd_print(debug_buf); // This would require passing lcd_print
 }
 
 double pop_d(S_Dbl *s) {
     if (s->top < 0) { error("Value Stack Underflow"); return 0.0; }
-    return s->data[s->top--];
+    double val = s->data[s->top--];
+    // DEBUG PRINT
+    // char debug_buf[16];
+    // sprintf(debug_buf, "O:%.2f", val);
+    // lcd_print(debug_buf); // This would require passing lcd_print
+    return val;
 }
 
 int prec(char *op) {
@@ -127,15 +136,24 @@ double eval_rpn(char rpn[MAX][10], int n, double var_val) {
         char *t = rpn[i];
 
         if (isdigit(t[0]) || (t[0] == '-' && isdigit(t[1]))) {
-            push_d(&vals, atof(t));
+            double val = atof(t);
+            push_d(&vals, val);
+            // DEBUG PRINT
+            // sprintf(output, "Num:%.2f", val);
+            // lcd_print(output); delay_ms(500);
         } else if (!strcmp(t, "x") || !strcmp(t, "t")) {
             push_d(&vals, var_val);
+            // DEBUG PRINT
+            // sprintf(output, "Var:%.2f", var_val);
+            // lcd_print(output); delay_ms(500);
         } else if (is_op(t)) {
+            // DEBUG PRINT
+            // sprintf(output, "Op:%s", t);
+            // lcd_print(output); delay_ms(500);
             if (!strcmp(t, "!")) {
                 double a = pop_d(&vals);
                 push_d(&vals, m_fact(a));
             } 
-
             else {
                 double b = pop_d(&vals);
                 double a = pop_d(&vals);
@@ -146,6 +164,9 @@ double eval_rpn(char rpn[MAX][10], int n, double var_val) {
                 else if (!strcmp(t, "^")) push_d(&vals, m_pow(a, b));
             }
         } else if (is_func(t)) {
+            // DEBUG PRINT
+            // sprintf(output, "Func:%s", t);
+            // lcd_print(output); delay_ms(500);
             double a = pop_d(&vals);
             if (!strcmp(t, "sin")) push_d(&vals, m_sin(a));
             else if (!strcmp(t, "cos")) push_d(&vals, m_cos(a));
@@ -170,14 +191,8 @@ void compute(const char* input, double start, double end, double step, char* out
     
     // Mode A: Single scalar (Calculator)
     if (step <= 0 || (m_abs(end - start) < 1e-9)) {
-        // --- DEBUG: Print RPN queue ---
-        output[0] = '\0';
-        for (int i = 0; i < n; i++) {
-            strcat(output, rpn[i]);
-            strcat(output, " ");
-        }
-        // double res = eval_rpn(rpn, n, start);
-        // sprintf(output, "%.6f", res);
+        double res = eval_rpn(rpn, n, start);
+        sprintf(output, "%.6f", res);
     } 
     // Mode B: Function Mapping (Plotter)
     else {

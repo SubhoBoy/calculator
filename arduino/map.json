@@ -1,0 +1,24 @@
+{
+  "keypad_mappings": {
+    "mode_1": {
+      "description": "Key Assignments in Mode 1",
+      "layout": [
+        ["0", "1", "2", "3", "4"],
+        ["5", "6", "7", "8", "9"],
+        ["+", "-", "×", "÷", "sin("],
+        ["cos(", "tan(", "e^(", "ln(", "Clear"],
+        ["Backspace", ".", "=", "Mode shift", "π"]
+      ]
+    },
+    "mode_2": {
+      "description": "Key Assignments in Mode 2",
+      "layout": [
+        ["0", "1", "2", "3", "4"],
+        ["5", "6", "7", "8", "9"],
+        ["(", ")", "x^y", "fact(", "arcsin("],
+        ["arccos(", "arctan(", "mod", "log10(", "Clear"],
+        ["Backspace", ".", "=", "Mode shift", "π"]
+      ]
+    }
+  }
+}

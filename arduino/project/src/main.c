@@ -1,26 +1,21 @@
 #include "defines.h"
 #include "timer.h"
 #include "lcd.h"
-#include "pars.h" // Only pars.h is needed for eval_rpn
-#include <stdio.h> // For sprintf
+#include <stdlib.h> // For atof
+#include <stdio.h>  // For sprintf
 
 int main(void) {
     timer_init();
     lcd_init();
 
-    lcd_print("Eval RPN Test");
+    lcd_print("atof Test");
     delay_ms(1000);
     lcd_clear();
 
-    // Hardcoded RPN for "1 1 +"
-    char rpn_test[3][10] = {"1", "1", "+"};
-    int n_test = 3;
-    double var_val_test = 0; // Not used in this simple test
-
-    double result = eval_rpn(rpn_test, n_test, var_val_test);
+    double test_val = atof("1.23");
 
     char result_str[16];
-    sprintf(result_str, "Res:%.6f", result);
+    sprintf(result_str, "Val:%.6f", test_val);
     lcd_print(result_str);
 
     while (1) {

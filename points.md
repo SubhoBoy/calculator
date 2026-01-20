@@ -1,0 +1,24 @@
+- [ ] Fix the unary minus hack
+- [ ] Make absolutely everything non-blocking (keypad, lcd) [enables blinking cursor]
+- [ ] Use I2C for LCD
+- [ ] Ladder for input (volt div)
+- [ ] Hardware debouncing using cap (low pass filter)
+- [ ] Fix the backspace
+- [ ] Implement `Ans` memory.
+- [ ] Implement `M` memory.
+- [ ] When adding to exp buffer on keypress, use strcpy to end of buf instead of strcat, which is O(N).
+- [ ] Error Handling
+- [ ] `Q-sqrt`: Precision vs speed?
+- [ ] Dynamic step sizing for RK4
+- [ ] Don't hardcode ORD, for most of the functions this is leading to loss of memory
+- [ ] Implement tan() directly
+- [ ] Remove defines from lcd.c
+- [ ] Angle (deg/rad/gra) modes
+- [ ] Scientific notation
+- [ ] Hyperbolic funcs
+- [ ] Power saving mode
+- [ ] Graphing mode
+- [ ] OOP and MVC pattern
+- [ ] CORDIC
+- [ ] Fixed point arithmetic
+- [ ] Embedded C++

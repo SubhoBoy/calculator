@@ -32,23 +32,20 @@ int keypad_scan(void) {
     uint8_t col_pins[] = {KEYPAD_COL_1, KEYPAD_COL_2, KEYPAD_COL_3, KEYPAD_COL_4, KEYPAD_COL_5};
 
     for (int r = 0; r < KEYPAD_ROWS; r++) {
-        // Drive current row low
         gpio_write(&KEYPAD_ROW_PORT, row_pins[r], 0);
 
         for (int c = 0; c < KEYPAD_COLS; c++) {
             if (gpio_read(&KEYPAD_COL_PIN, col_pins[c]) == 0) {
-                // Button pressed, debounce
+                // debounce
                 delay_ms(20);
                 while (gpio_read(&KEYPAD_COL_PIN, col_pins[c]) == 0);
                 delay_ms(20);
                 
-                // Drive row high again
-                gpio_write(&KEYPAD_ROW_PORT, row_pins[r], 1);
+                gpio_write(&KEYPAD_ROW_PORT, row_pins[r], 1); //reset cuz exiting
                 return (r * KEYPAD_COLS) + c;
             }
         }
-        // Drive row high again
         gpio_write(&KEYPAD_ROW_PORT, row_pins[r], 1);
     }
-    return -1; // No key pressed
+    return -1; // all open
 }

@@ -10,16 +10,9 @@ ISR(TIMER1_COMPA_vect) {
 }
 
 void timer_init(void) {
-    // CTC mode, prescaler of 64
-    TCCR1B |= (1 << WGM12) | (1 << CS11) | (1 << CS10);
-    
-    // Set compare value for 1ms interrupt
+    TCCR1B |= (1 << WGM12) | (1 << CS11) | (1 << CS10); //CTC
     OCR1A = 249;
-    
-    // Enable compare interrupt
     TIMSK1 |= (1 << OCIE1A);
-    
-    // Enable global interrupts
     sei();
 }
 

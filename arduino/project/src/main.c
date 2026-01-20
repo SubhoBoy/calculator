@@ -7,27 +7,26 @@
 #include <string.h>
 #include <stdio.h>
 
-#define MAX_EXPRESSION_LEN 256
+#define MAX_EXPRESSION_LEN 16
 
 static char expression_buffer[MAX_EXPRESSION_LEN];
 static int buffer_index = 0;
 static int current_mode = 1;
 
-// Keypad mappings from map.json
 const char* keypad_mode_1[KEYPAD_ROWS][KEYPAD_COLS] = {
   {"0", "1", "2", "3", "4"},
   {"5", "6", "7", "8", "9"},
   {"+", "-", "*", "/", "sin("},
-  {"cos(", "tan(", "e^(", "ln(", "Clear"},
-  {"Backspace", ".", "=", "Mode shift", "3.14159"} // "PI" replaced with value
+  {"cos(", "tan(", "exp(", "ln(", "Clear"},
+  {"Backspace", ".", "=", "Mode shift", "3.14159"}
 };
 
 const char* keypad_mode_2[KEYPAD_ROWS][KEYPAD_COLS] = {
   {"0", "1", "2", "3", "4"},
   {"5", "6", "7", "8", "9"},
-  {"(", ")", "^", "fact(", "arcsin("}, // "arcsin(" etc. are placeholders, not implemented in func.c
-  {"arccos(", "arctan(", "mod", "log10(", "Clear"},
-  {"Backspace", ".", "=", "Mode shift", "3.14159"} // "PI" replaced with value
+  {"(", ")", "^", "fact(", "asin("},
+  {"acos(", "atan(", "mod(", "log10(", "Clear"},
+  {"Backspace", ".", "=", "Mode shift", "3.14159"}
 };
 
 void handle_key_press(int key_index) {
@@ -47,8 +46,7 @@ void handle_key_press(int key_index) {
         lcd_clear();
     } else if (strcmp(key_str, "Backspace") == 0) {
         if (buffer_index > 0) {
-            // This is a simplification. A proper implementation would handle multi-character tokens.
-            // For now, just remove the last character.
+            // Must handle multi-char tokens. TODO
             expression_buffer[--buffer_index] = '\0';
             lcd_clear();
             lcd_print(expression_buffer);
@@ -59,11 +57,11 @@ void handle_key_press(int key_index) {
         lcd_print(current_mode == 1 ? "Mode 1" : "Mode 2");
         delay_ms(500);
         lcd_clear();
-        lcd_print(expression_buffer); // Reprint the current expression
+        lcd_print(expression_buffer); // reprint
     } else if (strcmp(key_str, "=") == 0) {
         if (buffer_index > 0) {
-            char result[32]; // Buffer for the result
-            compute(expression_buffer, 0, 0, 0, result); // Call parser's compute function
+            char result[32];
+            compute(expression_buffer, 0, 0, 0, result);
             
             lcd_clear();
             lcd_set_cursor(0,0);
@@ -72,12 +70,11 @@ void handle_key_press(int key_index) {
             lcd_print("=");
             lcd_print(result);
             
-            // Reset for next calculation
+            // next
             buffer_index = 0;
             expression_buffer[0] = '\0';
         }
     } else {
-        // Append character to buffer if space is available
         if (buffer_index + strlen(key_str) < MAX_EXPRESSION_LEN) {
             strcat(expression_buffer, key_str);
             buffer_index += strlen(key_str);
@@ -88,7 +85,7 @@ void handle_key_press(int key_index) {
             lcd_print("Buffer Full!");
             delay_ms(1000);
             lcd_clear();
-            lcd_print(expression_buffer); // Show current buffer again
+            lcd_print(expression_buffer);
         }
     }
 }

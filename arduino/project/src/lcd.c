@@ -3,12 +3,10 @@
 #include <avr/io.h>
 #include <util/delay.h>
 
-// --- Private Function Prototypes ---
 static void lcd_pulse_enable(void);
 static void lcd_write_4bits(uint8_t data);
 static void lcd_write(uint8_t data, uint8_t rs);
 
-// --- Pin Configuration ---
 #define LCD_RS_DDR  DDRD
 #define LCD_E_DDR   DDRD
 #define LCD_D_DDR   DDRD
@@ -24,18 +22,16 @@ static void lcd_write(uint8_t data, uint8_t rs);
 #define LCD_D6_PIN  PD6
 #define LCD_D7_PIN  PD7
 
-// --- Public Functions ---
-
 void lcd_init(void) {
-    // 1. Configure pins as output
+    // init
     LCD_RS_DDR |= (1 << LCD_RS_PIN);
     LCD_E_DDR  |= (1 << LCD_E_PIN);
     LCD_D_DDR  |= (1 << LCD_D4_PIN) | (1 << LCD_D5_PIN) | (1 << LCD_D6_PIN) | (1 << LCD_D7_PIN);
 
-    // 2. Wait for LCD to power up
+    // powering on
     _delay_ms(50);
 
-    // 3. Software Reset Sequence (as per HD44780 datasheet)
+    // software reset sequence (as per HD44780 datasheet)
     lcd_write_4bits(0x30); // Send 0011
     _delay_ms(5);
     lcd_write_4bits(0x30); // Send 0011
